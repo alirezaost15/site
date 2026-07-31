@@ -24,7 +24,7 @@ if (!file_exists($FILE)) {
   exit;
 }
 
-$list = json_decode(file_get_contents($FILE), true);
+$list = @json_decode(@file_get_contents($FILE), true);
 if (!is_array($list)) { $list = []; }
 
 echo json_encode(['ok' => true, 'answers' => $list], JSON_UNESCAPED_UNICODE);

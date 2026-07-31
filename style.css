@@ -948,6 +948,29 @@ body.ready .hero-card > :nth-child(10) { animation-delay: .8s; }
 
 /* حرف اولِ نامه — حذف شد بنا به سلیقه */
 
+/* توست هماهنگ‌سازی ناموفق */
+.sync-toast {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  z-index: 999;
+  max-width: min(92vw, 380px);
+  padding: 11px 18px;
+  border-radius: 99px;
+  background: rgba(30, 12, 20, .92);
+  color: #ffd7e2;
+  font-size: .88rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .35s ease, transform .35s ease;
+}
+
+.sync-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
 /* امضای پای نامه */
 .letter-sign {
   margin-top: 6px;

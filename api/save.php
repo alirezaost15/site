@@ -35,8 +35,11 @@ if (!is_array($input) || ($input['key'] ?? '') !== $API_KEY || !isset($input['an
 }
 
 // ساخت پوشه‌ی data اگر وجود نداشته باشد
-if (!is_dir(__DIR__ . '/data')) { @mkdir(__DIR__ . '/data', 0755, true); }
-if (!file_exists($FILE)) { file_put_contents($FILE, '[]'); }
+if (!is_dir(__DIR__ . '/data')) { @mkdir(__DIR__ . '/data', 0775, true); }
+if (!file_exists($FILE)) {
+  $ok = @file_put_contents($FILE, '[]');
+  if ($ok === false) { http_response_code(500); echo json_encode(['ok' => false, 'error' => 'cannot create data file']); exit; }
+}
 
 if (filesize($FILE) > $MAX_JSON_SIZE) {
   http_response_code(413);
@@ -61,6 +64,11 @@ foreach ($input['answers'] as $a) {
 // نگه‌داشتن فقط آخرین رکوردها
 $list = array_slice($list, -$MAX_RECORDS);
 
-file_put_contents($FILE, json_encode($list, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX);
+$written = @file_put_contents($FILE, json_encode($list, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX);
+if ($written === false) {
+  http_response_code(500);
+  echo json_encode(['ok' => false, 'error' => 'cannot write data file']);
+  exit;
+}
 
 echo json_encode(['ok' => true, 'total' => count($list)]);

@@ -4,3 +4,6 @@ api/data/answers.json
 # فایل‌های سیستم
 Thumbs.db
 .DS_Store
+
+# Railway CLI
+.railway/
