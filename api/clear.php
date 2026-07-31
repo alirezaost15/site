@@ -14,7 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit; }
 
-$input = json_decode(file_get_contents('php://input'), true);
+$raw = file_get_contents('php://input');
+if (strncmp($raw, "\xEF\xBB\xBF", 3) === 0) { $raw = substr($raw, 3); } // حذف BOM احتمالی
+$input = json_decode($raw, true);
 if (!is_array($input) || ($input['key'] ?? '') !== $API_KEY) {
   http_response_code(403);
   echo json_encode(['ok' => false, 'error' => 'unauthorized']);

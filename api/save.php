@@ -5,6 +5,11 @@
  */
 require __DIR__ . '/config.php';
 
+// امن برای هر هاستی — بعضی‌ها mbstring ندارن
+if (!function_exists('mb_substr')) {
+  function mb_substr($str, $start, $len) { return substr($str, $start, $len); }
+}
+
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
@@ -18,7 +23,9 @@ $MAX_JSON_SIZE = 5 * 1024 * 1024; // 5MB
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit; }
 
-$input = json_decode(file_get_contents('php://input'), true);
+$raw = file_get_contents('php://input');
+if (strncmp($raw, "\xEF\xBB\xBF", 3) === 0) { $raw = substr($raw, 3); } // حذف BOM احتمالی
+$input = json_decode($raw, true);
 
 // بررسی رمز و ساختار ورودی
 if (!is_array($input) || ($input['key'] ?? '') !== $API_KEY || !isset($input['answers']) || !is_array($input['answers'])) {
