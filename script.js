@@ -14,6 +14,9 @@ const CONFIG = {
   loaderMs: 1450,                // مدت نمایش صفحهی بارگذاری
   tapCountForAdmin: 5,           // چند بار لمس لوگو برای باز شدن قفل؟
   tapWindowMs: 4000,
+  // 📡 ذخیرهسازی روی سرور — باید با $API_KEY در api/config.php یکی باشد
+  serverEnabled: true,
+  serverKey: 'love-2026-strawberry-secret',
 };
 
 /** سؤالها — همه متن آزاد؛ type = 'text' (پشتیبانی 'choice' و 'yesno' هم هست) */
@@ -181,14 +184,18 @@ const Storage = {
   add(question, answer) {
     const now = new Date();
     const list = this.read();
-    list.push({
+    const record = {
       question,
       answer,
       date: faDate.format(now),
       time: faTime.format(now),
       ts: now.toISOString(),
-    });
+    };
+    list.push(record);
     this.write(list);
+
+    // 📡 هم‌زمان به سرور هم ارسال می‌شود (اگر آنلاین باشد)
+    Server.push(record);
   },
 
   remove(ts) {
@@ -201,7 +208,46 @@ const Storage = {
 };
 
 /* ================================================================
-   4) FX ENGINE — bursts, confetti, ambient float, ripple
+   4) SERVER SYNC — ذخیرهی پاسخها روی هاست (PHP api/)
+   ================================================================ */
+
+const Server = {
+  enabled: CONFIG.serverEnabled,
+  key: CONFIG.serverKey,
+
+  /** ارسال بی‌صدا — اگر آفلاین باشد هیچ اتفاقی نمی‌افتد */
+  push(record) {
+    if (!this.enabled) return;
+    fetch('api/save.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: this.key, answers: [record] }),
+      keepalive: true,
+    }).catch(() => {});
+  },
+
+  /** دریافت همهی پاسخهای سرور */
+  async fetchAll() {
+    if (!this.enabled) return [];
+    const res = await fetch(`api/view.php?key=${encodeURIComponent(this.key)}`);
+    if (!res.ok) throw new Error('server error');
+    const data = await res.json();
+    return Array.isArray(data.answers) ? data.answers : [];
+  },
+
+  /** پاککردن همهی پاسخهای سرور */
+  async clearAll() {
+    if (!this.enabled) return;
+    await fetch('api/clear.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: this.key }),
+    });
+  },
+};
+
+/* ================================================================
+   5) FX ENGINE — bursts, confetti, ambient float, ripple
    ================================================================ */
 
 const FX = {
@@ -799,6 +845,7 @@ function startCelebration() {
 const Admin = {
   tapCount: 0,
   tapTimer: null,
+  serverMode: false,
 
   init() {
     $('#admin-trigger').addEventListener('click', () => this.onTap());
@@ -807,6 +854,8 @@ const Admin = {
     $('#btn-admin-close').addEventListener('click', () => this.closePanel());
     $('#btn-export').addEventListener('click', () => this.export());
     this.wireClearButton();
+    $('#btn-server-view').addEventListener('click', () => this.toggleServerView());
+    $('#btn-server-clear').addEventListener('click', () => this.confirmServerClear());
 
     const passInput = $('#admin-pass');
     passInput.addEventListener('keydown', (e) => {
@@ -869,15 +918,39 @@ const Admin = {
   },
 
   render() {
-    const list = Storage.read();
-    $('#admin-stats').textContent = `${list.length} پاسخ ثبت شده`;
+    this.serverMode = false;
+    $('#btn-server-view').textContent = '📡 پاسخ‌های سرور';
+    this.renderList(Storage.read(), false);
+    this.renderStats();
+  },
 
+  async renderStats() {
+    const localCount = Storage.read().length;
+    let text = `${localCount} پاسخ محلی`;
+    try {
+      const serverList = await Server.fetchAll();
+      text += ` · ${serverList.length} پاسخ سرور`;
+    } catch {
+      text += ' · سرور: در دسترس نیست';
+    }
+    $('#admin-stats').textContent = text;
+  },
+
+  /** لیست پاسخها — mode = false: محلی، true: سرور */
+  renderList(list, fromServer) {
     const box = $('#admin-list');
     box.innerHTML = '';
 
     if (list.length === 0) {
-      box.innerHTML = '<p class="admin-empty">هنوز پاسخی ثبت نشده 🍃</p>';
+      box.innerHTML = `<p class="admin-empty">${fromServer ? 'سرور هنوز پاسخی نداره 🌱' : 'هنوز پاسخی ثبت نشده 🍃'}</p>`;
       return;
+    }
+
+    if (fromServer) {
+      const note = document.createElement('p');
+      note.className = 'admin-empty';
+      note.textContent = '— پاسخ‌های ذخیره‌شده روی سرور —';
+      box.appendChild(note);
     }
 
     list
@@ -891,14 +964,61 @@ const Admin = {
           <div class="ai-main">
             <div class="ai-q">${escapeHtml(item.question)}</div>
             <div class="ai-a">${escapeHtml(item.answer)}</div>
-            <div class="ai-time">${item.date} — ${item.time}</div>
+            <div class="ai-time">${escapeHtml(item.date)} — ${escapeHtml(item.time)}</div>
           </div>
-          <button class="ai-del" type="button" aria-label="حذف">🗑</button>`;
-        row.querySelector('.ai-del').addEventListener('click', () => {
-          Storage.remove(item.ts);
-          this.render();
-        });
+          ${fromServer ? '' : '<button class="ai-del" type="button" aria-label="حذف">🗑</button>'}`;
+        if (!fromServer) {
+          row.querySelector('.ai-del').addEventListener('click', () => {
+            Storage.remove(item.ts);
+            this.renderList(Storage.read(), false);
+            this.renderStats();
+          });
+        }
         box.appendChild(row);
+      });
+  },
+
+  async toggleServerView() {
+    const btn = $('#btn-server-view');
+    if (this.serverMode) {
+      this.serverMode = false;
+      btn.textContent = '📡 پاسخ‌های سرور';
+      this.renderList(Storage.read(), false);
+      return;
+    }
+    btn.textContent = 'در حال دریافت...';
+    try {
+      const serverList = await Server.fetchAll();
+      this.serverMode = true;
+      btn.textContent = '🗂 پاسخ‌های محلی';
+      this.renderList(serverList, true);
+    } catch {
+      btn.textContent = '📡 پاسخ‌های سرور';
+      $('#admin-stats').textContent = 'اتصال به سرور برقرار نشد 😢';
+    }
+  },
+
+  /** حذف پاسخهای سرور — با تأیید دوباره */
+  confirmServerClear() {
+    const btn = $('#btn-server-clear');
+    if (!this.serverArmed) {
+      this.serverArmed = true;
+      btn.textContent = 'مطمئنی؟ دوباره بزن';
+      setTimeout(() => {
+        this.serverArmed = false;
+        btn.textContent = 'حذف پاسخ‌های سرور';
+      }, 2500);
+      return;
+    }
+    this.serverArmed = false;
+    btn.textContent = 'حذف پاسخ‌های سرور';
+    Server.clearAll()
+      .then(() => {
+        this.renderStats();
+        if (this.serverMode) this.renderList([], true);
+      })
+      .catch(() => {
+        $('#admin-stats').textContent = 'پاک‌کردن سرور انجام نشد 😢';
       });
   },
 
@@ -920,13 +1040,20 @@ const Admin = {
       armed = false;
       btn.textContent = 'حذف همه';
       Storage.clear();
-      this.render();
+      this.renderList(Storage.read(), false);
+      this.renderStats();
     });
   },
 
-  export() {
-    const list = Storage.read();
-    const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
+  async export() {
+    const local = Storage.read();
+    let all = [...local];
+    try {
+      const serverList = await Server.fetchAll();
+      all = [...local, ...serverList];
+    } catch { /* آفلاین — فقط محلی */ }
+
+    const blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
