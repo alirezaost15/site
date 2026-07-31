@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -12,18 +13,19 @@
 
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
   <!-- ============================================================
        Loading screen — short, elegant, fades into the hero
   ============================================================= -->
-  <div id="loader" class="loader" role="status" aria-label="در حال بارگذاری">
+  <div id="loader" class="loader" role="status" aria-label="در حال صورتی شدن">
     <div class="loader-core">
       <span class="loader-strawberry" aria-hidden="true">🍓</span>
       <div class="loader-bar" aria-hidden="true">
         <span class="loader-bar-fill"></span>
       </div>
-      <p class="loader-text">دارم یه چیز قشنگ آماده می‌کنم...</p>
+      <p class="loader-text"> در حال صورتی شدن ...</p>
     </div>
   </div>
 
@@ -31,10 +33,18 @@
        Ambient background — blobs + grain + floating decorations
   ============================================================= -->
   <div class="bg" aria-hidden="true">
-    <div class="blob-move blob-a"><div class="blob"></div></div>
-    <div class="blob-move blob-b"><div class="blob"></div></div>
-    <div class="blob-move blob-c"><div class="blob"></div></div>
-    <div class="blob-move blob-d"><div class="blob"></div></div>
+    <div class="blob-move blob-a">
+      <div class="blob"></div>
+    </div>
+    <div class="blob-move blob-b">
+      <div class="blob"></div>
+    </div>
+    <div class="blob-move blob-c">
+      <div class="blob"></div>
+    </div>
+    <div class="blob-move blob-d">
+      <div class="blob"></div>
+    </div>
     <div class="bg-grain"></div>
     <div id="float-layer" class="float-layer"></div>
   </div>
@@ -51,7 +61,10 @@
   <header id="topbar" class="topbar">
     <button id="admin-trigger" class="topbar-logo" type="button" aria-label="لوگو">🍓</button>
     <div id="progress" class="progress" hidden>
-      <div class="progress-track"><div id="progress-fill" class="progress-fill"><span id="progress-heart" class="progress-heart" aria-hidden="true">❤️</span></div></div>
+      <div class="progress-track">
+        <div id="progress-fill" class="progress-fill"><span id="progress-heart" class="progress-heart"
+            aria-hidden="true">❤️</span></div>
+      </div>
     </div>
     <span class="topbar-spacer" aria-hidden="true"></span>
   </header>
@@ -68,10 +81,11 @@
           <span class="hero-sparkle s4" aria-hidden="true">✦</span>
           <span class="hero-sparkle s5" aria-hidden="true">✦</span>
           <div class="hero-emoji" aria-hidden="true">🍓</div>
-          <h1 class="hero-title">سلام <span class="hero-accent">خوشگل</span> <span class="hero-heart" aria-hidden="true">❤️</span></h1>
-          <p class="hero-sub">یه چیز کوچولو برات ساختم...</p>
-          <p class="hero-hint">فقط قول بده تا آخرش همراه من باشی 🍓</p>
-          <p class="hero-tap-hint"><span class="tap-icon" aria-hidden="true">👆</span> همین‌جا لمس کن تا شروع بشه</p>
+          <h1 class="hero-title">سلام <span class="hero-accent">توت فرنگی کوچولوم</span> <span class="hero-heart"
+              aria-hidden="true">❤️</span></h1>
+          <p class="hero-sub">بدون اینکه حدس بزنی آخرش چیه...</p>
+          <p class="hero-hint"> شروعش کن🍓</p>
+          <p class="hero-tap-hint"><span class="tap-icon" aria-hidden="true">👆</span> باشه</p>
         </div>
       </div>
     </section>
@@ -102,14 +116,14 @@
             <div class="env-front"></div>
             <div class="env-seal" aria-hidden="true">❤️</div>
           </div>
-          <p class="env-hint">برای باز کردن، لمسش کن 👆</p>
+          <p class="env-hint"> بزن روش 👆</p>
         </div>
 
         <!-- نامه -->
         <article id="letter" class="letter glass" hidden>
           <div class="letter-head">
             <span class="letter-stamp" aria-hidden="true">💌</span>
-            <h2 class="letter-title">نامه‌ای برای تو</h2>
+            <h2 class="letter-title"> </h2>
           </div>
           <div class="letter-rule" aria-hidden="true"></div>
           <div id="letter-body" class="letter-body"></div>
@@ -126,26 +140,26 @@
       <div class="final-wrap">
         <div class="tilt">
           <div class="final-card glass">
-          <div class="final-emoji" aria-hidden="true">💌</div>
-          <h2 class="final-title">حالا یه سؤال خیلی مهم...</h2>
-          <p class="final-q">می‌خوای همیشه کنارم بمونی؟</p>
-          <div id="final-buttons" class="final-buttons">
-            <button id="btn-yes" class="btn btn-yes" type="button">
-              <span class="btn-label">❤️ آره، می‌مونم</span>
-              <span class="btn-shine" aria-hidden="true"></span>
-            </button>
-            <div id="no-wrap" class="no-wrap">
-              <div class="no-move">
-                <button id="btn-no" class="btn btn-no" type="button">
-                  <span class="btn-label">🤍 نه</span>
-                </button>
+            <div class="final-emoji" aria-hidden="true">💌</div>
+            <h2 class="final-title">حالا یه سؤال خیلی مهم...</h2>
+            <p class="final-q">می‌خوای همیشه کنار علیرضا بمونی؟</p>
+            <div id="final-buttons" class="final-buttons">
+              <button id="btn-yes" class="btn btn-yes" type="button">
+                <span class="btn-label">❤️ آره، می‌مونم</span>
+                <span class="btn-shine" aria-hidden="true"></span>
+              </button>
+              <div id="no-wrap" class="no-wrap">
+                <div class="no-move">
+                  <button id="btn-no" class="btn btn-no" type="button">
+                    <span class="btn-label"> نه</span>
+                  </button>
+                </div>
               </div>
             </div>
+            <p id="final-msg" class="final-msg" aria-live="polite"></p>
           </div>
-          <p id="final-msg" class="final-msg" aria-live="polite"></p>
         </div>
       </div>
-    </div>
     </section>
 
     <!-- ============================ CELEBRATION ============================ -->
@@ -156,9 +170,9 @@
             <div class="celeb-heart-wrap">
               <div class="celeb-heart" aria-hidden="true">❤️</div>
             </div>
-            <h2 class="celeb-title">قول دادی... 🥺</h2>
-            <p class="celeb-text">حالا دیگه رسمیه.<br />منم قول می‌دم همیشه کنارت بمونم؛ توی هر روزی که بیاد. 🍓💖</p>
-            <div class="celeb-love" aria-hidden="true">دوستت دارم ❤️</div>
+            <h2 class="celeb-title">قول انگشتی... 🥺</h2>
+            <p class="celeb-text"> <br />منم قول می‌دم همیشه کنارت بمونم؛ توی هر روزی که بیاد. 🍓💖</p>
+            <div class="celeb-love" aria-hidden="true"> خوشالم که پیداکردم تورو ❤️</div>
             <button id="btn-replay" class="btn btn-ghost" type="button">🔄 بازپخش این خاطره</button>
           </div>
         </div>
@@ -175,7 +189,8 @@
       <h2 class="lock-title">رمز ورود</h2>
       <input id="admin-pass" class="input" type="password" placeholder="••••••••" autocomplete="off" />
       <div class="lock-actions">
-        <button id="btn-pass-ok" class="btn btn-primary btn-sm" type="button"><span class="btn-label">ورود</span></button>
+        <button id="btn-pass-ok" class="btn btn-primary btn-sm" type="button"><span
+            class="btn-label">ورود</span></button>
         <button id="btn-pass-cancel" class="btn btn-ghost btn-sm" type="button">انصراف</button>
       </div>
       <p id="admin-error" class="admin-error" hidden>رمز اشتباهه 🙈</p>
@@ -207,4 +222,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>

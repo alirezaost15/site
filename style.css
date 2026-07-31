@@ -723,6 +723,16 @@ body.ready .hero-card > :nth-child(10) { animation-delay: .8s; }
 
 .text-form { display: grid; gap: 14px; }
 
+.text-form.shake { animation: shake .5s var(--ease-out); }
+
+.field-error {
+  margin: 4px 0 0;
+  font-size: .9rem;
+  font-weight: 800;
+  color: var(--rose-600);
+  animation: pop-in .3s var(--ease-out) both;
+}
+
 /* پاسخ متنی کاربر — مثل پیامک نمایش داده میشه */
 .answer-echo {
   margin-top: 8px;
@@ -936,16 +946,7 @@ body.ready .hero-card > :nth-child(10) { animation-delay: .8s; }
 
 .letter-body p { margin-bottom: 1.1em; }
 
-/* حرف اولِ نامه — بزرگ و قرمز، مثل کاغذهای قدیمی */
-.letter-body p:first-of-type::first-letter {
-  float: right;
-  margin-left: 10px;
-  padding-top: 8px;
-  font-size: 3em;
-  line-height: 1;
-  font-weight: 900;
-  color: var(--rose-600);
-}
+/* حرف اولِ نامه — حذف شد بنا به سلیقه */
 
 /* امضای پای نامه */
 .letter-sign {
